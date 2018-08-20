@@ -13,11 +13,14 @@ import {
     Label,
     Content,
     Item,
-    ListItem,
+    Col,
     Left,
     Radio,
-    Right
+    Right,
+    Toast,
+    TabHeading
 } from "native-base";
+import firebase from 'firebase';
 
 YellowBox.ignoreWarnings(
     [
@@ -34,20 +37,44 @@ export default class NovaVenda extends React.Component {
         super(props);
         this.state = {
             quantidade: '',
-            umkg: false,
-            dataNascimento: '',
-            valor: '',
-            parcelas: ''
+            umkg: '',
+            meiokg: '',
+            observacao: ''
         }
-
+        toast = Toast;
     }
     static navigationOptions = {
         headerTitle: "Nova Venda",
         headerBackButton: true
     }
 
+    onValueChange2(value) {
+        this.setState({
+            selected2: value
+        });
+    }
+
+    gravarVenda(){
+        //const ws = new WebSocket(makeSocketURL());
+        const data = new Date();
+        const mesAtual = data.getMonth() + 1;
+        const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
+        firebase.database().ref('vendas/'+ dataFinal).push().set({
+                umkg: this.state.umkg,
+                meiokg: this.state.meiokg,
+                obs: this.state.observacao
+
+        }).then(() => Toast.show({
+            text: 'Venda gravada!',
+            buttonText: 'Ok'
+          })).catch(() => Toast.show({
+            text: 'ERRO!',
+            buttonText: 'Ok'
+          }))
+        
+    }
     render() {
-        const { quantidade, umkg, valor, parcelas } = this.state;
+        const { umkg, meiokg, observacao } = this.state;
         return (
             <Container>
                 <Header>
@@ -60,64 +87,50 @@ export default class NovaVenda extends React.Component {
                         </Button>
                     </Left>
                     <Body>
-                        <Title>Saída de Caixa</Title>
+                        <Title>Lançar nova venda</Title>
                     </Body>
                     <Right />
                 </Header>
                 <Content>
                     <Form>
                         <Item stackedLabel>
-                            <Label>Quantidade</Label>
+                            <Label>Pacotes de 1 Kg:</Label>
                             <Input
-                                placeholder="Quantos pacotes?"
-
+                                keyboardType="numeric"
+                                placeholder='0'
                                 autoCorrect={false}
-                                value={quantidade}
-                                onChangeText={text => this.setState({ quantidade: text })}
+                                value={umkg}
+                                onChangeText={text => this.setState({ umkg: text })}
+                            />
+                        </Item>
+                        <Item stackedLabel>
+                            <Label>Pacotes de Meio Kg:</Label>
+                            <Input
+                                keyboardType="numeric"
+                                placeholder='0'
+                                autoCorrect={false}
+                                value={meiokg}
+                                onChangeText={text => this.setState({ meiokg: text })}
                             />
                         </Item>
 
-                        <ListItem selected={true}>
-                            <Left>
-                                <Text>1 Kg</Text>
-                            </Left>
-                            <Right>
-                                <Radio value={umkg} selected={true} />
-                            </Right>
-                        </ListItem>
-                        <ListItem>
-                            <Left>
-                                <Text>1/2 Kg</Text>
-                            </Left>
-                            <Right>
-                                <Radio selected={false} />
-                            </Right>
-                        </ListItem>
+
 
 
                         <Item stackedLabel>
-                            <Label>Valor a ser financiado</Label>
-                            <Input
-                                placeholder="R$0,00"
-                                autoCorrect={false}
-                                keyboardType="numeric"
-                                value={valor}
-                                onChangeText={text => this.setState({ valor: text })} />
-                        </Item>
-                        <Item stackedLabel>
-                            <Label>Quantidade de Parcelas</Label>
+                            <Label>Observação</Label>
                             <Input
 
                                 placeholder=""
                                 autoCorrect={false}
-                                keyboardType="numeric"
-                                value={parcelas}
-                                onChangeText={text => this.setState({ parcelas: text })} />
+                                value={observacao}
+                                onChangeText={text => this.setState({ observacao: text })} />
                         </Item>
                         <Button primary block
-                            onPress={() => this.props.navigation.navigate('Resultado')}
-                            center
-                        ><Text>Simular</Text></Button>
+                            onPress={() => this.gravarVenda()}
+                            center>
+                            <Text>Gravar venda</Text>
+                        </Button>
                     </Form>
 
                 </Content>

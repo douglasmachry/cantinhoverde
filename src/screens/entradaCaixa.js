@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, YellowBox } from "react-native";
+import { Platform, YellowBox, WebSocket } from "react-native";
 import {
     Button,
     Text,
@@ -12,18 +12,21 @@ import {
     Title,
     Left,
     Icon,
-    Right
+    Right,
+    Label
 } from "native-base";
 import { Drawer } from 'native-base';
 import SideBar from '../sidebar';
 import firebase from 'firebase';
+import NovaVenda from "./novaVenda";
 //import firestore from 'firebase/firebase-firestore';
 //import GLOBAL from './global';
 //import firebaseAdm from 'firebase-admin';
 YellowBox.ignoreWarnings(
     [
         'Warning: isMounted(...) is deprecated',
-        'Module RCTImageLoader'
+        'Module RCTImageLoader',
+        'Setting a timer'
     ]
 );
 
@@ -38,32 +41,25 @@ export default class EntradaCaixa extends React.Component {
         
     }
     componentDidMount(){
-        var ref = firebase.database().ref('valores');
-        ref.once('value', function(snapshot){
-            precos = snapshot.val();
-            try{
-                setState({umkg: precos.umkg});
-            }catch(error){
-                console.log(error);
-                
-            }
-            
-            //console.log(precos);
-            //console.log("VAI TE CAGAR"); 
-        });  
-    }
-
-    gravarVenda(){
         const data = new Date();
         const mesAtual = data.getMonth() + 1;
         const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
-        firebase.database().ref('vendas/'+ dataFinal).push().set({
-                umkg: 5,
-                meiokg: 3,
-                obs: "teste2"
-
+        firebase.database().ref('vendas/'+dataFinal).on('value', function (snapshot) {
+           console.log("RESULTADO "+ dataFinal + "----" +JSON.stringify(snapshot.val()));
+           this.meiokg = 0;
+           this.umkg = 0;
+           snapshot.forEach(function(childSnapshot){   
+            this.meiokg += childSnapshot.child("meiokg").val();
+            this.umkg += childSnapshot.child('umkg').val();
+            console.log("MEIO KG "+this.meiokg+" ------ UM KG "+this.umkg);
+           })
+           
         });
     }
+
+    
+        //ws.close();
+    
 
     render() {
         closeDrawer = () => {
@@ -97,13 +93,13 @@ export default class EntradaCaixa extends React.Component {
                     </Header>
                     <Content padder>
                         <H1>Vendas de hoje: </H1>
-                        <H3>Pacotes de 1Kg: </H3> 
-                        <H3>Pacotes de meio Kg: </H3>
+                        <Text>Pacotes de 1Kg: {this.umkg}</Text> 
+                        <Text>Pacotes de meio Kg: {this.meiokg}</Text>
                         
-                        <Button block onPress={() => this.gravarVenda()}>
+                        <Button block onPress={() => this.props.navigation.navigate('NovaVenda')}>
                             <Text>Nova Venda</Text>
                         </Button>
-                        <Text>{this.state.umkg}</Text>
+                        
                     </Content>
                 </Container>
             </Drawer>

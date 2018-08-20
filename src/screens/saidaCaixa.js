@@ -27,6 +27,11 @@ YellowBox.ignoreWarnings(
 
 
 export default class SaidaCaixa extends React.Component {
+
+  constructor(props) {
+    super(props); 
+  }
+
   render() {
     closeDrawer = () => {
         this.drawer._root.close()
