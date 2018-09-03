@@ -34,27 +34,37 @@ YellowBox.ignoreWarnings(
 export default class EntradaCaixa extends React.Component {
     constructor(props) {
         super(props);
+        const data = new Date();
+        const mesAtual = data.getMonth() + 1;
+        const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
+        
+        this.database = firebase.database().ref('vendas/'+dataFinal);
         this.state = {
-            meiokg : '',
-            umkg : ''
+            umkg: 0,
+            meiokg: 0
         }
         
     }
     componentDidMount(){
-        const data = new Date();
-        const mesAtual = data.getMonth() + 1;
-        const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
-        firebase.database().ref('vendas/'+dataFinal).on('value', function (snapshot) {
-           console.log("RESULTADO "+ dataFinal + "----" +JSON.stringify(snapshot.val()));
-           this.meiokg = 0;
-           this.umkg = 0;
-           snapshot.forEach(function(childSnapshot){   
-            this.meiokg += childSnapshot.child("meiokg").val();
-            this.umkg += childSnapshot.child('umkg').val();
-            console.log("MEIO KG "+this.meiokg+" ------ UM KG "+this.umkg);
-           })
+        this.database.on('value', snapshot => {
+            meio = 0
+            um = 0
+            snapshot.forEach(function(childSnapshot){   
+                this.meio += parseInt(childSnapshot.child("meiokg").val());
+                this.um += parseInt(childSnapshot.child('umkg').val());
+                console.log("MEIO KG "+this.meio+" ------ UM KG "+this.um);
+               })
+
+            this.setState({
+                umkg: um,
+                meiokg: meio
+            });
+             console.log("RESULTADO "+ this.state.umkg + "----" );
+        }); 
+          
            
-        });
+          /* */        
+      
     }
 
     
@@ -93,8 +103,8 @@ export default class EntradaCaixa extends React.Component {
                     </Header>
                     <Content padder>
                         <H1>Vendas de hoje: </H1>
-                        <Text>Pacotes de 1Kg: {this.umkg}</Text> 
-                        <Text>Pacotes de meio Kg: {this.meiokg}</Text>
+                        <Text>Pacotes de 1Kg: {this.state.umkg}</Text> 
+                        <Text>Pacotes de meio Kg: {this.state.meiokg}</Text>
                         
                         <Button block onPress={() => this.props.navigation.navigate('NovaVenda')}>
                             <Text>Nova Venda</Text>
