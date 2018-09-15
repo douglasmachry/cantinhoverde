@@ -1,6 +1,7 @@
 package com.controlevendas;
 
 import com.facebook.react.ReactActivity;
+import com.toast.RCTToastPackage;
 
 public class MainActivity extends ReactActivity {
 

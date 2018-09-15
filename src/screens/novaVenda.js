@@ -13,14 +13,11 @@ import {
     Label,
     Content,
     Item,
-    Col,
     Left,
-    Radio,
-    Right,
-    Toast,
-    TabHeading
+    Right
 } from "native-base";
 import firebase from 'firebase';
+import Toast from 'react-native-toast-native';
 
 YellowBox.ignoreWarnings(
     [
@@ -41,7 +38,7 @@ export default class NovaVenda extends React.Component {
             meiokg: '',
             observacao: ''
         }
-        toast = Toast;
+        
     }
     static navigationOptions = {
         headerTitle: "Nova Venda",
@@ -56,25 +53,33 @@ export default class NovaVenda extends React.Component {
 
     gravarVenda(){
         //const ws = new WebSocket(makeSocketURL());
+        const styleToast={
+            width: 300,
+            height: Platform.OS === ("ios") ? 50 : 100,
+            fontSize: 12,
+            lineHeight: 1,
+            lines: 2,
+            paddingTop: -10,
+            borderRadius: 15,
+            yOffset:60
+        }
         const data = new Date();
         const mesAtual = data.getMonth() + 1;
         const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
-        firebase.database().ref('vendas/'+ dataFinal).push().set({
+        const hora = new Date().toLocaleTimeString();
+        firebase.database().ref('vendas/'+ dataFinal + "/" + hora).set({
                 umkg: this.state.umkg,
                 meiokg: this.state.meiokg,
                 obs: this.state.observacao
 
-        }).then(() => Toast.show({
-            text: 'Venda gravada!',
-            buttonText: 'Ok'
-          })).catch(() => Toast.show({
-            text: 'ERRO!',
-            buttonText: 'Ok'
-          }))
+        })
+         Toast.show("Venda registrada!",Toast.SHORT,Toast.BOTTOM, styleToast);
+         this.props.navigation.navigate('Entrada');
         
     }
     render() {
         const { umkg, meiokg, observacao } = this.state;
+        
         return (
             <Container>
                 <Header>
@@ -89,7 +94,7 @@ export default class NovaVenda extends React.Component {
                     <Body>
                         <Title>Lançar nova venda</Title>
                     </Body>
-                    <Right />
+                   
                 </Header>
                 <Content>
                     <Form>
@@ -97,7 +102,7 @@ export default class NovaVenda extends React.Component {
                             <Label>Pacotes de 1 Kg:</Label>
                             <Input
                                 keyboardType="numeric"
-                                placeholder='0'
+                                placeholder=''
                                 autoCorrect={false}
                                 value={umkg}
                                 onChangeText={text => this.setState({ umkg: text })}
@@ -107,7 +112,7 @@ export default class NovaVenda extends React.Component {
                             <Label>Pacotes de Meio Kg:</Label>
                             <Input
                                 keyboardType="numeric"
-                                placeholder='0'
+                                placeholder=''
                                 autoCorrect={false}
                                 value={meiokg}
                                 onChangeText={text => this.setState({ meiokg: text })}
@@ -127,7 +132,9 @@ export default class NovaVenda extends React.Component {
                                 onChangeText={text => this.setState({ observacao: text })} />
                         </Item>
                         <Button primary block
-                            onPress={() => this.gravarVenda()}
+                            onPress={() =>
+                                this.gravarVenda()
+                            }
                             center>
                             <Text>Gravar venda</Text>
                         </Button>

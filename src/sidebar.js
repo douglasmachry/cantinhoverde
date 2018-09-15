@@ -25,6 +25,11 @@ const routes = [
         texto: "Saída de Caixa",
         icon: "money-off"
         
+    },
+    {
+      menu: "HistoricoVendas",
+      texto: "Histórico de Vendas",
+      icon: "history"
     }
 ];
 export default class SideBar extends React.Component {
@@ -56,9 +61,7 @@ export default class SideBar extends React.Component {
                   button
                   onPress={() => this.props.navigator.navigate(data.menu)}
                 >
-                <Left>
                 
-                </Left>
                 <Icon type="MaterialIcons" name={data.icon} />
                   <Text>{data.texto}</Text>
                   <Right></Right>

@@ -1,3 +1,7 @@
 rootProject.name = 'ControleVendas'
+include ':react-native-toast-native'
+project(':react-native-toast-native').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-toast-native/android')
+
+
 
 include ':app'

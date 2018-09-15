@@ -2,6 +2,8 @@
 import EntradaCaixa from "./screens/entradaCaixa";
 import SaidaCaixa from "./screens/saidaCaixa";
 import NovaVendaScreen from './screens/novaVenda';
+import HistoricoVendaScreen from './screens/historicoVenda';
+import { Root } from "native-base";
 //import SideBar from "./sidebar";
 import { createStackNavigator } from "react-navigation";
 import firebase from 'firebase';
@@ -34,10 +36,13 @@ const rootStack = createStackNavigator({
   },
   NovaVenda: {
       screen: NovaVendaScreen
+  },
+  HistoricoVendas: {
+      screen: HistoricoVendaScreen
   }
 },
 {
-  initialRouteName: 'Entrada',
+  initialRouteName: 'HistoricoVendas',
   navigationOptions: {
       header: null,
 
