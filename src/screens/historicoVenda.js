@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Container, Header, Content, DatePicker, Left, Text, Body, Right, Title, Button, Icon, View, List, ListItem } from 'native-base';
+import { FlatList, StyleSheet } from 'react-native';
+import { Container, Header, Left, Text, Body, Title, Button, Icon, View, Drawer } from 'native-base';
+import SideBar from '../sidebar';
 import DropdownMenu from 'react-native-dropdown-menu';
 import firebase from 'firebase';
-import { func } from 'prop-types';
+
 
 export default class HistoricoVenda extends Component {
   constructor(props) {
@@ -12,7 +13,8 @@ export default class HistoricoVenda extends Component {
 
     this.state = {
       text: '',
-      vendas: ''
+      vendas: '',
+      itemVenda: ''
     };
 
 
@@ -20,21 +22,19 @@ export default class HistoricoVenda extends Component {
 
   componentDidMount() {
     let itens = [];
+    let horarios = [];
+    horarios['vendas'] = [];
     this.database.on('value', snapshot => {
-      //console.log(snapshot.val());
       snapshot.forEach(function (childSnapshot) {
         let item = [];
+        item['vendas'] = new Array;
         item['data'] = childSnapshot.key;
-        childSnapshot.forEach(function(childOfChild){
-          let horarios = childOfChild.val();
-          horarios['hora'] = childOfChild.key;
-          item.push(horarios);
+        childSnapshot.forEach(function (childOfChild) {
+          item['vendas'].push(childOfChild.val());
         })
-        //item['hora'] = childSnapshot.data.key;
         itens.push(item);
       })
-      this.state.vendas = itens;
-
+      this.setState({vendas:itens});
     });
   }
 
@@ -44,9 +44,19 @@ export default class HistoricoVenda extends Component {
 
 
   render() {
-    //console.log(this.state.vendas);
-    var data = [["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]];
+    closeDrawer = () => {
+      this.drawer._root.close()
+    };
+    openDrawer = () => {
+        this.drawer._root.open()
+    };
+    var mes = [["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]];
+    //this.setState({text: mes});
     return (
+      <Drawer
+                ref={(ref) => { this.drawer = ref; }}
+                content={<SideBar navigator={this.props.navigation} />}
+                onClose={() => this.closeDrawer} >
       <Container>
         <Header>
           <Left>
@@ -62,67 +72,61 @@ export default class HistoricoVenda extends Component {
           </Body>
 
         </Header>
-        <View style={{ flex: 1 }}>
-          <DropdownMenu
-            style={{ flex: 1 }}
-            bgColor={'white'}
-            tintColor={'#666666'}
-            activityTintColor={'green'}
-            // arrowImg={}      
-            // checkImage={}   
-            // optionTextStyle={{color: '#333333'}}
-            // titleStyle={{color: '#333333'}} 
-            // maxHeight={300} 
-            handler={(selection, row) => this.setState({ text: data[selection][row] })}
-            data={data}
-          >
+        
             <View>
-              <Text>TESTE</Text>
               <FlatList
                 data={this.state.vendas}
-                renderItem={({ item }) => this.renderRow(item)}
+                renderItem={({ item }) => (this.renderRow(item))}
                 keyExtractor={(item, index) => item.data}
               />
             </View>
 
-          </DropdownMenu>
-        </View>
+          
+       
 
 
       </Container>
+      </Drawer>
     );
 
   }
 
   renderRow(venda) {
-    console.log(venda);
-    //let vendasDoDia = '';
-    
+    //console.log(venda.vendas);
+
+
     return (
-      <TouchableOpacity style={styles.row}>
-        <View style={styles.row}>
-          <Text>{venda.data}</Text>
-          {this.renderVendas(venda)}
+      <View>
+        <View>
+          <Text style={styles.data}>{venda.data.replace("-", "/").replace("-", "/")}</Text>
+          {venda.vendas.map((item, index) => {
+            return (
+              <View key={index} style={styles.venda}>
+                <Text style={styles.titleVenda}>{item.obs} - {item.hora}</Text>
+                <Text style={styles.descricaoVenda}>Meio Kg: {item.meiokg} - Um Kg: {item.umkg}</Text>
+
+              </View>
+            )
+          })}
         </View>
-        
-      </TouchableOpacity>
+      </View>
     );
   }
 
-  renderVendas(v){
-    v.forEach(function(filho){
-      console.log(filho.obs);
-      return(
-        <View>
-          <Text style={styles.obs}>{filho.obs}</Text>
-          <Text>{filho.hora}</Text>
-          <Text>{filho.umkg}</Text>
-          <Text>{filho.meiokg}</Text>
+  renderVendas(v) {
+    v.forEach(function (filho) {
+      //console.log(filho.obs);
+      return (
+        <View style={{ flex: 1 }}>
+          <Text>{filho.obs}</Text>
+
         </View>
       )
-
+      //console.log(this.state.itemVenda);
     })
-    
+
+
+
   }
 
 }
@@ -134,8 +138,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center'
   },
-  obs: {
-    color: '#555',
-    fontSize: 12
+  data: {
+    fontSize: 22,
+    backgroundColor: "#98FB98"
+  },
+  venda:{
+    borderBottomColor: "#D3D3D3",
+    borderBottomWidth:1
+  },
+  titleVenda:{
+    fontSize:18,
+    paddingLeft: 20
+  },
+  descricaoVenda:{
+    paddingLeft: 35,
+    color: "#696969"
   }
 });

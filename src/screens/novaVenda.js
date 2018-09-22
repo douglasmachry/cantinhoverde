@@ -67,10 +67,11 @@ export default class NovaVenda extends React.Component {
         const mesAtual = data.getMonth() + 1;
         const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
         const hora = new Date().toLocaleTimeString();
-        firebase.database().ref('vendas/'+ dataFinal + "/" + hora).set({
+        firebase.database().ref('vendas/'+ dataFinal).push({
                 umkg: this.state.umkg,
                 meiokg: this.state.meiokg,
-                obs: this.state.observacao
+                obs: this.state.observacao,
+                hora: hora
 
         })
          Toast.show("Venda registrada!",Toast.SHORT,Toast.BOTTOM, styleToast);
