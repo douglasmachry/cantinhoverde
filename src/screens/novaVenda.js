@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, YellowBox } from "react-native";
+import { Platform, YellowBox, Alert } from "react-native";
 import {
     Header,
     Icon,
@@ -14,7 +14,7 @@ import {
     Content,
     Item,
     Left,
-    Right
+    CheckBox
 } from "native-base";
 import firebase from 'firebase';
 import Toast from 'react-native-toast-native';
@@ -33,12 +33,13 @@ export default class NovaVenda extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            quantidade: '',
-            umkg: '',
-            meiokg: '',
-            observacao: ''
+            umkg: '0',
+            meiokg: '0',
+            observacao: '',
+            checked: false,
+            clicked: {}
         }
-        
+
     }
     static navigationOptions = {
         headerTitle: "Nova Venda",
@@ -51,9 +52,9 @@ export default class NovaVenda extends React.Component {
         });
     }
 
-    gravarVenda(){
+    gravarVenda() {
         //const ws = new WebSocket(makeSocketURL());
-        const styleToast={
+        const styleToast = {
             width: 300,
             height: Platform.OS === ("ios") ? 50 : 100,
             fontSize: 12,
@@ -61,26 +62,28 @@ export default class NovaVenda extends React.Component {
             lines: 2,
             paddingTop: -10,
             borderRadius: 15,
-            yOffset:60
+            yOffset: 60
         }
         const data = new Date();
         const mesAtual = data.getMonth() + 1;
         const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
         const hora = new Date().toLocaleTimeString();
-        firebase.database().ref('vendas/'+ dataFinal).push({
-                umkg: this.state.umkg,
-                meiokg: this.state.meiokg,
-                obs: this.state.observacao,
-                hora: hora
+        firebase.database().ref('vendas/' + dataFinal).push({
+            umkg: this.state.umkg,
+            meiokg: this.state.meiokg,
+            obs: this.state.observacao,
+            hora: hora,
+            pago: this.state.checked
 
         })
-         Toast.show("Venda registrada!",Toast.SHORT,Toast.BOTTOM, styleToast);
-         this.props.navigation.navigate('Entrada');
-        
+        Toast.show("Venda registrada!", Toast.SHORT, Toast.BOTTOM, styleToast);
+        this.props.navigation.navigate('Entrada');
+
     }
     render() {
-        const { umkg, meiokg, observacao } = this.state;
-        
+
+        //const { umkg, meiokg, observacao } = this.state;
+
         return (
             <Container>
                 <Header>
@@ -95,7 +98,7 @@ export default class NovaVenda extends React.Component {
                     <Body>
                         <Title>Lançar nova venda</Title>
                     </Body>
-                   
+
                 </Header>
                 <Content>
                     <Form>
@@ -105,7 +108,7 @@ export default class NovaVenda extends React.Component {
                                 keyboardType="numeric"
                                 placeholder=''
                                 autoCorrect={false}
-                                value={umkg}
+                                
                                 onChangeText={text => this.setState({ umkg: text })}
                             />
                         </Item>
@@ -115,7 +118,7 @@ export default class NovaVenda extends React.Component {
                                 keyboardType="numeric"
                                 placeholder=''
                                 autoCorrect={false}
-                                value={meiokg}
+                                
                                 onChangeText={text => this.setState({ meiokg: text })}
                             />
                         </Item>
@@ -129,13 +132,28 @@ export default class NovaVenda extends React.Component {
 
                                 placeholder=""
                                 autoCorrect={false}
-                                value={observacao}
+                                
                                 onChangeText={text => this.setState({ observacao: text })} />
+                        </Item>
+                        <Item>
+                            <CheckBox checked={this.state.checked} title="Pago"
+                                onPress={() => this.setState({ checked: !this.state.checked })} />
+                            <Label>    Pago</Label>
                         </Item>
                         <Button primary block
                             onPress={() =>
-                                this.gravarVenda()
-                            }
+                                Alert.alert(
+                                    'Confirmar venda',
+                                    'Pacotes de 1 kg: '+this.state.umkg+
+                                    '\nPacotes de Meio Kg: '+this.state.meiokg+
+                                    '\nObservação: '+this.state.observacao+
+                                    '\nPago: '+(this.state.checked ? 'Sim' : 'Não'),
+                                    [
+                                      {text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                                      {text: 'OK', onPress: () => this.gravarVenda()},
+                                    ],
+                                    { cancelable: false }
+                                  )}
                             center>
                             <Text>Gravar venda</Text>
                         </Button>

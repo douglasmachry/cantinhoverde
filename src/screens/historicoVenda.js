@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { Container, Header, Left, Text, Body, Title, Button, Icon, View, Drawer } from 'native-base';
-import SideBar from '../sidebar';
-import DropdownMenu from 'react-native-dropdown-menu';
+import SideBar from './sidebar';
 import firebase from 'firebase';
 
 
@@ -33,8 +32,11 @@ export default class HistoricoVenda extends Component {
           item['vendas'].push(childOfChild.val());
         })
         itens.push(item);
+        //console.log(item);
       })
       this.setState({vendas:itens});
+    }, function (errorObject) {
+      console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
     });
   }
 
@@ -55,7 +57,7 @@ export default class HistoricoVenda extends Component {
     return (
       <Drawer
                 ref={(ref) => { this.drawer = ref; }}
-                content={<SideBar navigator={this.props.navigation} />}
+                content={<SideBar navigation={this.props.navigation} />}
                 onClose={() => this.closeDrawer} >
       <Container>
         <Header>
@@ -103,11 +105,15 @@ export default class HistoricoVenda extends Component {
             return (
               <View key={index} style={styles.venda}>
                 <Text style={styles.titleVenda}>{item.obs} - {item.hora}</Text>
-                <Text style={styles.descricaoVenda}>Meio Kg: {item.meiokg} - Um Kg: {item.umkg}</Text>
-
+                <Text style={styles.descricaoVenda}>
+                  Meio Kg: {item.meiokg} - 
+                  Um Kg: {item.umkg} - 
+                  Pago: { item.pago?<Text style={{color:'green'}}>Sim</Text>:<Text style={{color:'red'}}>Não</Text> }
+                  </Text>
+                
               </View>
             )
-          })}
+          })} 
         </View>
       </View>
     );

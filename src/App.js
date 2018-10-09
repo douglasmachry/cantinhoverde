@@ -1,9 +1,10 @@
-//import React, { Component } from "react";
+import React, { Component } from "react";
 import EntradaCaixa from "./screens/entradaCaixa";
 import SaidaCaixa from "./screens/saidaCaixa";
 import NovaVendaScreen from './screens/novaVenda';
 import HistoricoVendaScreen from './screens/historicoVenda';
-import { Root } from "native-base";
+import VendasPendentesScreen from './screens/vendasPendentes'; 
+import FechamentoCaixaScreen from './screens/fechamentoCaixa';
 //import SideBar from "./sidebar";
 import { createStackNavigator } from "react-navigation";
 import firebase from 'firebase';
@@ -27,7 +28,7 @@ try{
 
 //vendas = db.CollectionReference;
 
-const rootStack = createStackNavigator({
+const RootStack = createStackNavigator({
   Entrada: {
       screen: EntradaCaixa
   },
@@ -39,14 +40,20 @@ const rootStack = createStackNavigator({
   },
   HistoricoVendas: {
       screen: HistoricoVendaScreen
+  },
+  VendasPendentes: {
+      screen: VendasPendentesScreen
+  },
+  FechamentoCaixa:{
+      screen: FechamentoCaixaScreen
   }
 },
 {
-  initialRouteName: 'HistoricoVendas',
+  initialRouteName: 'Entrada',
   navigationOptions: {
       header: null,
 
   }
 });
 
-export default rootStack;
+export default RootStack;

@@ -12,8 +12,10 @@ import {
   Left,
   Right
 } from "native-base";
+import App from '../App.js';
+
 //import { DrawerNavigator } from "react-navigation";
-import GLOBAL from './screens/global';
+//import GLOBAL from './screens/global';
 const routes = [
     {
         menu: "Entrada",
@@ -30,7 +32,8 @@ const routes = [
       menu: "HistoricoVendas",
       texto: "Histórico de Vendas",
       icon: "history"
-    }
+    },
+   
 ];
 export default class SideBar extends React.Component {
    
@@ -38,13 +41,17 @@ export default class SideBar extends React.Component {
     constructor(props){
         super(props);
     }
+
+    
+
   render() {
+    //console.log(this.props.navigation);
     return (
       <Container>
           
         <Content style={{backgroundColor:"#FFF"}} >
           <Image
-            source={require('./assets/logo_cv_jpeg_antigo.png')}
+            source={require('../assets/logo_cv_jpeg_antigo.png')}
             style={{
               height: 250,
               width: "100%",
@@ -59,7 +66,7 @@ export default class SideBar extends React.Component {
               return (
                 <ListItem
                   button
-                  onPress={() => this.props.navigator.navigate(data.menu)}
+                  onPress={()=>this.props.navigation.push(data.menu)}
                 >
                 
                 <Icon type="MaterialIcons" name={data.icon} />

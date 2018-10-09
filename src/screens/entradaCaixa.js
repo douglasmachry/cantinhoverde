@@ -13,12 +13,11 @@ import {
     Left,
     Icon,
     Right,
-    Label
+    Drawer
 } from "native-base";
-import { Drawer } from 'native-base';
-import SideBar from '../sidebar';
+import SideBar from './sidebar';
 import firebase from 'firebase';
-import NovaVenda from "./novaVenda";
+//import NovaVenda from "./novaVenda";
 //import firestore from 'firebase/firebase-firestore';
 //import GLOBAL from './global';
 //import firebaseAdm from 'firebase-admin';
@@ -67,32 +66,30 @@ export default class EntradaCaixa extends React.Component {
           /* */        
       
     }
-
+    closeDrawer = () => {
+        this.drawer._root.close()
+    };
+    openDrawer = () => {
+        this.drawer._root.open()
+    };
     
         //ws.close();
-    
-
-    render() {
-        closeDrawer = () => {
-            this.drawer._root.close()
-        };
-        openDrawer = () => {
-            this.drawer._root.open()
-        };
-       
         
 
+    render() {
+        //console.log(this.props.navigation);
+        
         return (
             <Drawer
                 ref={(ref) => { this.drawer = ref; }}
-                content={<SideBar navigator={this.props.navigation} />}
-                onClose={() => this.closeDrawer} >
+                content={<SideBar navigation={this.props.navigation} />}
+                onClose={() => this.closeDrawer()} >
                 <Container>
                     <Header>
                         <Left>
                             <Button
                                 transparent
-                                onPress={() => openDrawer()}
+                                onPress={() => this.openDrawer()}
                             >
                                 <Icon name="menu" />
                             </Button>
@@ -108,8 +105,16 @@ export default class EntradaCaixa extends React.Component {
                         <Text>Pacotes de meio Kg: {this.state.meiokg}</Text>
                         <Text>Total de vendas: R$ {((this.state.umkg*1400)+(this.state.meiokg*800))/100}</Text>
                         
-                        <Button block onPress={() => this.props.navigation.navigate('NovaVenda')}>
+                        <Button style={{marginTop:5}} block onPress={() => this.props.navigation.navigate('NovaVenda')}>
                             <Text>Nova Venda</Text>
+                        </Button>
+                        
+                        <Button style={{marginTop:5}} block onPress={() => this.props.navigation.navigate('VendasPendentes')}>
+                            <Text>Pagamentos Pendentes</Text>
+                        </Button>
+
+                        <Button style={{marginTop:5}} block onPress={() => this.props.navigation.navigate('FechamentoCaixa')}>
+                            <Text>Fechamento de Caixa</Text>
                         </Button>
                         
                     </Content>
