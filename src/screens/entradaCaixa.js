@@ -1,19 +1,17 @@
 import React from "react";
-import { Platform, YellowBox, WebSocket } from "react-native";
+import { Platform, YellowBox, StyleSheet } from "react-native";
 import {
     Button,
     Text,
     Container,
-    H1,
-    H3,
     Body,
     Content,
     Header,
     Title,
     Left,
     Icon,
-    Right,
-    Drawer
+    Drawer,
+    View
 } from "native-base";
 import SideBar from './sidebar';
 import firebase from 'firebase';
@@ -25,7 +23,8 @@ YellowBox.ignoreWarnings(
     [
         'Warning: isMounted(...) is deprecated',
         'Module RCTImageLoader',
-        'Setting a timer'
+        'Setting a timer',
+        'Cannot update'
     ]
 );
 
@@ -33,52 +32,46 @@ YellowBox.ignoreWarnings(
 export default class EntradaCaixa extends React.Component {
     constructor(props) {
         super(props);
-        const data = new Date();
-        const mesAtual = data.getMonth() + 1;
-        const dataFinal = data.getDate().toString() + "-" + mesAtual.toString() + "-" + data.getFullYear().toString();
-        
-        this.database = firebase.database().ref('vendas/'+dataFinal);
+        this.database = firebase.database().ref('/fechamentoCaixa/');
         this.state = {
+            caixa:'',
             umkg: 0,
             meiokg: 0,
             vendas: 0
         }
+
+    }
+    componentWillMount() {
+       this.buscarDados();
+    }
+
+    componentDidMount(){
         
     }
-    componentDidMount(){
-        this.database.on('value', snapshot => {
-            meio = 0
-            um = 0
-            snapshot.forEach(function(childSnapshot){   
-                this.meio += parseInt(childSnapshot.child("meiokg").val());
-                this.um += parseInt(childSnapshot.child('umkg').val());
-                //console.log("MEIO KG "+this.meio+" ------ UM KG "+this.um);
-               })
 
-            this.setState({
-                umkg: um,
-                meiokg: meio
-            });
-             //console.log("RESULTADO "+ this.state.umkg + "----" );
-        }); 
-          
-           
-          /* */        
-      
+    buscarDados() {
+        this.database.on('value', snapshot => {
+            
+            this.setState({caixa:snapshot.val()})
+            
+        }, function (errorObject) {
+            console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
+        });
     }
+
     closeDrawer = () => {
         this.drawer._root.close()
     };
     openDrawer = () => {
         this.drawer._root.open()
     };
-    
-        //ws.close();
-        
+
+    //ws.close();
+
 
     render() {
         //console.log(this.props.navigation);
-        
+
         return (
             <Drawer
                 ref={(ref) => { this.drawer = ref; }}
@@ -95,31 +88,43 @@ export default class EntradaCaixa extends React.Component {
                             </Button>
                         </Left>
                         <Body>
-                            <Title>Entrada de Caixa</Title>
+                            <Title>Administrar Vendas</Title>
                         </Body>
-                        <Right />
+                        
                     </Header>
                     <Content padder>
-                        <H1>Vendas de hoje: </H1>
-                        <Text>Pacotes de 1Kg: {this.state.umkg}</Text> 
-                        <Text>Pacotes de meio Kg: {this.state.meiokg}</Text>
-                        <Text>Total de vendas: R$ {((this.state.umkg*1400)+(this.state.meiokg*800))/100}</Text>
-                        
-                        <Button style={{marginTop:5}} block onPress={() => this.props.navigation.navigate('NovaVenda')}>
+                        <View >
+                            <Text>
+                                Entrada em Caixa: R$ {this.state.caixa.totalEntrada} {"\n"}
+                                Saída de Caixa: R$ {this.state.caixa.totalSaida}{"\n"}
+                                Saldo em Caixa: R$ {this.state.caixa.totalEntrada - this.state.caixa.totalSaida}{"\n"}
+                                Saldo a receber: R$ {this.state.caixa.totalReceber}
+                            </Text>
+                        </View>
+                        <View>
+
+                        </View>
+
+                        <Button style={{ marginTop: 5 }} block onPress={() => this.props.navigation.navigate('NovaVenda')}>
                             <Text>Nova Venda</Text>
                         </Button>
-                        
-                        <Button style={{marginTop:5}} block onPress={() => this.props.navigation.navigate('VendasPendentes')}>
+
+                        <Button style={{ marginTop: 5 }} block onPress={() => this.props.navigation.navigate('VendasPendentes')}>
                             <Text>Pagamentos Pendentes</Text>
                         </Button>
-
-                        <Button style={{marginTop:5}} block onPress={() => this.props.navigation.navigate('FechamentoCaixa')}>
-                            <Text>Fechamento de Caixa</Text>
+                        <Button style={{ marginTop: 5 }} block onPress={() => this.props.navigation.navigate('Saida')}>
+                            <Text>Nova Despesa</Text>
                         </Button>
-                        
+
                     </Content>
                 </Container>
             </Drawer>
         );
     }
 }
+const styles = StyleSheet.create({
+    lista:{
+        fontSize: 17,
+        lineHeight: 17
+    }
+ });

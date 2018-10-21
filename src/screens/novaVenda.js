@@ -32,12 +32,18 @@ YellowBox.ignoreWarnings(
 export default class NovaVenda extends React.Component {
     constructor(props) {
         super(props);
+        this.bancoEstoque = firebase.database().ref('/estoque/');
+        this.bancoPrecos = firebase.database().ref('/valores/');
+        this.bancoControleVendas = firebase.database().ref('/fechamentoCaixa/');
         this.state = {
             umkg: '0',
             meiokg: '0',
             observacao: '',
             checked: false,
-            clicked: {}
+            clicked: {},
+            estoque: '',
+            precos: '',
+            controleVendas: ''
         }
 
     }
@@ -45,22 +51,64 @@ export default class NovaVenda extends React.Component {
         headerTitle: "Nova Venda",
         headerBackButton: true
     }
+    componentDidMount(){
+        this.buscarPrecos();
+    }
 
-    onValueChange2(value) {
-        this.setState({
-            selected2: value
+    buscarPrecos(){
+        this.bancoPrecos.on('value', snapshot => {
+
+            this.setState({ precos: snapshot.val() })
+
+        }, function (errorObject) {
+            console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
         });
+    }
+    atualizarDados() {
+        let umkg = parseInt(this.state.umkg);
+        let meiokg = parseInt(this.state.meiokg);
+        let valorVendas = ((this.state.precos.umkg)*(umkg))+((this.state.precos.meiokg)*(meiokg));
+        this.bancoEstoque.transaction(function(valorAtual){
+            if(valorAtual != null){
+                let valor = valorAtual;
+                valor.umkg -= umkg;
+                valor.meiokg -= meiokg;
+                return valor;
+            }else{
+                return 0;
+            }
+        })
+        if(this.state.checked){
+            this.bancoControleVendas.transaction(function(valorAtual){
+                if(valorAtual != null){
+                    valorAtual.totalEntrada += valorVendas;
+                    return valorAtual;
+                }else{
+                    return 0;
+                }
+            })
+        }else{
+            this.bancoControleVendas.transaction(function(valorAtual){
+                if(valorAtual != null){
+                    valorAtual.totalReceber += valorVendas;
+                    return valorAtual;
+                }else{
+                    return 0;
+                }
+            })
+        }
+        this.props.navigation.navigate('Entrada');
     }
 
     gravarVenda() {
         //const ws = new WebSocket(makeSocketURL());
         const styleToast = {
             width: 300,
-            height: Platform.OS === ("ios") ? 50 : 100,
+            height: Platform.OS === ("ios") ? 50 : 125,
             fontSize: 12,
-            lineHeight: 1,
+            lineHeight: 2,
             lines: 2,
-            paddingTop: -10,
+            paddingTop: -13,
             borderRadius: 15,
             yOffset: 60
         }
@@ -76,8 +124,9 @@ export default class NovaVenda extends React.Component {
             pago: this.state.checked
 
         })
+        this.atualizarDados();
         Toast.show("Venda registrada!", Toast.SHORT, Toast.BOTTOM, styleToast);
-        this.props.navigation.navigate('Entrada');
+        
 
     }
     render() {
@@ -108,7 +157,7 @@ export default class NovaVenda extends React.Component {
                                 keyboardType="numeric"
                                 placeholder=''
                                 autoCorrect={false}
-                                
+
                                 onChangeText={text => this.setState({ umkg: text })}
                             />
                         </Item>
@@ -118,7 +167,7 @@ export default class NovaVenda extends React.Component {
                                 keyboardType="numeric"
                                 placeholder=''
                                 autoCorrect={false}
-                                
+
                                 onChangeText={text => this.setState({ meiokg: text })}
                             />
                         </Item>
@@ -132,28 +181,30 @@ export default class NovaVenda extends React.Component {
 
                                 placeholder=""
                                 autoCorrect={false}
-                                
+
                                 onChangeText={text => this.setState({ observacao: text })} />
                         </Item>
                         <Item>
                             <CheckBox checked={this.state.checked} title="Pago"
                                 onPress={() => this.setState({ checked: !this.state.checked })} />
-                            <Label>    Pago</Label>
+                            <Text>         Pago</Text>
                         </Item>
-                        <Button primary block
+
+
+                        <Button style={{ marginTop: 5 }} success block
                             onPress={() =>
                                 Alert.alert(
                                     'Confirmar venda',
-                                    'Pacotes de 1 kg: '+this.state.umkg+
-                                    '\nPacotes de Meio Kg: '+this.state.meiokg+
-                                    '\nObservação: '+this.state.observacao+
-                                    '\nPago: '+(this.state.checked ? 'Sim' : 'Não'),
+                                    'Pacotes de 1 kg: ' + this.state.umkg +
+                                    '\nPacotes de Meio Kg: ' + this.state.meiokg +
+                                    '\nObservação: ' + this.state.observacao +
+                                    '\nPago: ' + (this.state.checked ? 'Sim' : 'Não'),
                                     [
-                                      {text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                                      {text: 'OK', onPress: () => this.gravarVenda()},
+                                        { text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                                        { text: 'OK', onPress: () => this.gravarVenda() },
                                     ],
                                     { cancelable: false }
-                                  )}
+                                )}
                             center>
                             <Text>Gravar venda</Text>
                         </Button>

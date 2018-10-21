@@ -17,39 +17,38 @@ import App from '../App.js';
 //import { DrawerNavigator } from "react-navigation";
 //import GLOBAL from './screens/global';
 const routes = [
-    {
-        menu: "Entrada",
-        texto: "Entrada de Caixa",
-        icon: "monetization-on"
-    },
-    {
-        menu: "Saida",
-        texto: "Saída de Caixa",
-        icon: "money-off"
-        
-    },
-    {
-      menu: "HistoricoVendas",
-      texto: "Histórico de Vendas",
-      icon: "history"
-    },
-   
+  {
+    menu: "Entrada",
+    texto: "Administrar Vendas",
+    icon: "monetization-on"
+  },
+  {
+    menu: "HistoricoVendas",
+    texto: "Histórico",
+    icon: "history"
+  },
+  {
+    menu: "Estoque",
+    texto: "Estoque",
+    icon: "view-module"
+  },
+
 ];
 export default class SideBar extends React.Component {
-   
 
-    constructor(props){
-        super(props);
-    }
 
-    
+  constructor(props) {
+    super(props);
+  }
+
+
 
   render() {
     //console.log(this.props.navigation);
     return (
       <Container>
-          
-        <Content style={{backgroundColor:"#FFF"}} >
+
+        <Content style={{ backgroundColor: "#FFF" }} >
           <Image
             source={require('../assets/logo_cv_jpeg_antigo.png')}
             style={{
@@ -66,10 +65,10 @@ export default class SideBar extends React.Component {
               return (
                 <ListItem
                   button
-                  onPress={()=>this.props.navigation.push(data.menu)}
+                  onPress={() => this.props.navigation.push(data.menu)}
                 >
-                
-                <Icon type="MaterialIcons" name={data.icon} />
+
+                  <Icon type="MaterialIcons" name={data.icon} />
                   <Text>{data.texto}</Text>
                   <Right></Right>
                 </ListItem>

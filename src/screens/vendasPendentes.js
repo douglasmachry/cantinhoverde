@@ -1,38 +1,68 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, Alert, Platform } from 'react-native';
+import { FlatList, StyleSheet, Alert, Platform, YellowBox } from 'react-native';
 import { Container, Header, Left, Text, Body, Title, Button, Icon, View, Drawer, Right } from 'native-base';
 import SideBar from './sidebar';
 import Toast from 'react-native-toast-native';
 import firebase from 'firebase';
 
+YellowBox.ignoreWarnings(
+    [
+        'Warning: isMounted(...) is deprecated',
+        'Module RCTImageLoader',
+        'Setting a timer',
+        'Cannot update during',
+        'Can only'
+    ]
+);
 
 export default class VendasPendentes extends Component {
     constructor(props) {
         super(props);
         this.database = firebase.database().ref('/vendas/');
-        buscarDados = this.buscarDados();
+        this.mounted = false;
+        this.bancoPrecos = firebase.database().ref('/valores/');
+        this.bancoControleVendas = firebase.database().ref('/fechamentoCaixa/');
         this.state = {
             recarregar: false,
-            vendas: ''
+            vendas: '',
+            precos: '',
 
         };
-        
+        //this.buscarDados();
 
+
+    }
+
+    componentWillMount() {
+        this.buscarDados();
     }
 
     componentDidMount() {
-        this.database.on('child_changed', () => {
-            this.buscarDados();
-        });
-        this.buscarDados;
-        
-        
+
     }
 
+    atualizarDados(venda) {
+        let umkg = parseInt(venda.umkg);
+        let meiokg = parseInt(venda.meiokg);
+        let valorVendas = ((this.state.precos.umkg) * (umkg)) + ((this.state.precos.meiokg) * (meiokg));
 
-    buscarDados(){
+
+        this.bancoControleVendas.transaction(function (valorAtual) {
+            if (valorAtual != null) {
+                valorAtual.totalEntrada += valorVendas;
+                valorAtual.totalReceber -= valorVendas;
+                return valorAtual;
+            } else {
+                return 0;
+            }
+        })
+
+        //this.props.navigation.goBack();
+    }
+
+    buscarDados() {
         let itens = [];
-        
+
         this.database.on('value', snapshot => {
             //console.log("RESULTADO DO DATABASE: " + JSON.stringify(snapshot.val()));
             snapshot.forEach(function (childSnapshot) {
@@ -61,6 +91,10 @@ export default class VendasPendentes extends Component {
         }, function (errorObject) {
             console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
         });
+        this.bancoPrecos.on('value', snapshot => {
+            this.setState({ precos: snapshot.val() });
+        })
+
     }
 
 
@@ -72,8 +106,10 @@ export default class VendasPendentes extends Component {
         openDrawer = () => {
             this.drawer._root.open()
         };
-        
-
+        //this.buscarDados;
+        this.database.on('child_changed', () => {
+            this.buscarDados();
+        });
         //this.setState({text: mes});
         return (
             <Drawer
@@ -151,7 +187,7 @@ export default class VendasPendentes extends Component {
                                             '\nObservação: ' + item.obs,
                                             [
                                                 { text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                                                { text: 'OK', onPress: () => this.pagar(item, venda.data,index) },
+                                                { text: 'OK', onPress: () => this.pagar(item, venda.data, index) },
                                             ],
                                             { cancelable: false }
                                         )}>
@@ -167,17 +203,17 @@ export default class VendasPendentes extends Component {
 
     }
 
-    
 
-    pagar(pend, data,i) {
+
+    pagar(pend, data, i) {
         //console.log(i); 
         const styleToast = {
             width: 300,
-            height: Platform.OS === ("ios") ? 50 : 100,
+            height: Platform.OS === ("ios") ? 50 : 125,
             fontSize: 12,
-            lineHeight: 1,
+            lineHeight: 2,
             lines: 2,
-            paddingTop: -10,
+            paddingTop: -13,
             borderRadius: 15,
             yOffset: 60
         }
@@ -186,11 +222,12 @@ export default class VendasPendentes extends Component {
         firebase.database().ref('/vendas/' + data + '/' + pend.key).update({
             pago: true
         });
-        Toast.show("Venda registrada!", Toast.SHORT, Toast.BOTTOM, styleToast);
+        this.atualizarDados(pend);
+        Toast.show("Pagamento registrado!", Toast.SHORT, Toast.BOTTOM, styleToast);
 
 
 
-        this.buscarDados();
+        //this.buscarDados();
         //this.props.navigation.navigate('Entrada');
     }
 

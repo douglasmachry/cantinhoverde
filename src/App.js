@@ -4,7 +4,8 @@ import SaidaCaixa from "./screens/saidaCaixa";
 import NovaVendaScreen from './screens/novaVenda';
 import HistoricoVendaScreen from './screens/historicoVenda';
 import VendasPendentesScreen from './screens/vendasPendentes'; 
-import FechamentoCaixaScreen from './screens/fechamentoCaixa';
+import FluxoCaixaScreen from './screens/fluxoCaixa';
+import EstoqueScreen from './screens/estoque';
 //import SideBar from "./sidebar";
 import { createStackNavigator } from "react-navigation";
 import firebase from 'firebase';
@@ -44,8 +45,11 @@ const RootStack = createStackNavigator({
   VendasPendentes: {
       screen: VendasPendentesScreen
   },
-  FechamentoCaixa:{
-      screen: FechamentoCaixaScreen
+  FluxoCaixa:{
+      screen: FluxoCaixaScreen
+  },
+  Estoque: {
+      screen: EstoqueScreen
   }
 },
 {

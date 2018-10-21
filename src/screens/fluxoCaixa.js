@@ -5,44 +5,35 @@ import SideBar from './sidebar';
 import firebase from 'firebase';
 
 
-export default class FechamentoCaixa extends Component {
+export default class FluxoCaixa extends Component {
     constructor(props) {
         super(props);
-        this.database = firebase.database().ref('/vendas/');
+        this.database = firebase.database().ref('/fechamentoCaixa/');
 
         this.state = {
-            text: '',
-            vendas: '',
-            itemVenda: ''
+            caixa:''
+            
         };
-
+        
 
     }
 
     componentDidMount() {
-        let itens = [];
-        let horarios = [];
-        horarios['vendas'] = [];
-        this.database.on('value', snapshot => {
-            snapshot.forEach(function (childSnapshot) {
-                let item = [];
-                item['vendas'] = new Array;
-                item['data'] = childSnapshot.key;
-                childSnapshot.forEach(function (childOfChild) {
-                    item['vendas'].push(childOfChild.val());
-                })
-                itens.push(item);
-                //console.log(item);
-            })
-            this.setState({ vendas: itens });
-        }, function (errorObject) {
-            console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
-        });
+       this.buscarDados();
+       console.log("RESULTADO DO DATABASE: " + this.state.caixa);
     }
 
 
 
-
+    buscarDados() {
+        this.database.on('value', snapshot => {
+            
+            this.setState({caixa:snapshot.val()})
+            
+        }, function (errorObject) {
+            console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
+        });
+    }
 
 
     render() {
@@ -69,50 +60,29 @@ export default class FechamentoCaixa extends Component {
                             </Button>
                         </Left>
                         <Body>
-                            <Title>Fechamento de Caixa</Title>
+                            <Title>Fluxo de Caixa</Title>
                         </Body>
 
                     </Header>
 
-                    <View>
-                        <Text>FECHAMENTO DE CAIXA</Text>
+                    <View >
+                        <Text style={styles.lista}>
+                            Entrada em Caixa: {this.state.caixa.totalEntrada} {"\n"}
+                            Saída de Caixa: {this.state.caixa.totalSaida}{"\n"}
+                            Saldo em Caixa: {this.state.caixa.saldoAtual}{"\n"}
+                            Saldo a receber: {this.state.caixa.totalReceber}
+                        </Text>
                     </View>
-
-
-
-
-
                 </Container>
             </Drawer>
         );
 
     }
-
-
-
 }
 
 const styles = StyleSheet.create({
-    row: {
-
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    data: {
-        fontSize: 22,
-        backgroundColor: "#98FB98"
-    },
-    venda: {
-        borderBottomColor: "#D3D3D3",
-        borderBottomWidth: 1
-    },
-    titleVenda: {
-        fontSize: 18,
-        paddingLeft: 20
-    },
-    descricaoVenda: {
-        paddingLeft: 35,
-        color: "#696969"
-    }
+   lista:{
+       fontSize: 20,
+       lineHeight: 30
+   }
 });

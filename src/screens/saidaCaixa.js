@@ -68,6 +68,15 @@ export default class SaidaCaixa extends React.Component {
       valor: this.state.mascara.replace(/[^0-9\.]+/g, "")
 
     })
+    let saidaCaixa = this.state.mascara.replace(/[^0-9\.]+/g, "");
+    firebase.database().ref('fechamentoCaixa/').transaction(function (valorAtual) {
+      if (valorAtual != null) {
+        valorAtual.totalSaida += parseInt(saidaCaixa);
+        return valorAtual;
+      } else {
+        return 0;
+      }
+    })
     Toast.show("Despesa registrada!", Toast.SHORT, Toast.BOTTOM, styleToast);
     this.props.navigation.navigate('Entrada');
   }
@@ -91,15 +100,15 @@ export default class SaidaCaixa extends React.Component {
             <Left>
               <Button
                 transparent
-                onPress={() => openDrawer()}
+                onPress={() => this.props.navigation.goBack()}
               >
-                <Icon name="menu" />
+                <Icon name="ios-arrow-back" />
               </Button>
             </Left>
             <Body>
-              <Title>Saída de Caixa</Title>
+              <Title>Despesas</Title>
             </Body>
-            <Right />
+
           </Header>
           <Content padder>
             <Form>

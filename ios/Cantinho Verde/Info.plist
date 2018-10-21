@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>ControleVendas</string>
+	<string>Cantinho Verde</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -55,6 +55,7 @@
 	<array>
 		<string>Entypo.ttf</string>
 		<string>EvilIcons.ttf</string>
+		<string>Feather.ttf</string>
 		<string>FontAwesome.ttf</string>
 		<string>Foundation.ttf</string>
 		<string>Ionicons.ttf</string>
@@ -66,7 +67,6 @@
 		<string>rubicon-icon-font.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
-		<string>Feather.ttf</string>
 	</array>
 </dict>
 </plist>
