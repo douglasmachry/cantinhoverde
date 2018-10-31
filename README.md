@@ -7,4 +7,6 @@ Segue abaixo os artefatos uilizados para o projeto:
 
 [Wireframes](https://github.com/douglasmachry/cantinhoverde/blob/master/artefatos/wireframes.md)
 
+[Telas do Sistema](https://github.com/douglasmachry/cantinhoverde/blob/master/artefatos/telas/telas.md)
+
 
