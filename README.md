@@ -5,6 +5,6 @@ Segue abaixo os artefatos uilizados para o projeto:
 
 <a href="https://gist.github.com/douglasmachry/3e79fae7863ef064a3515fe2df36aedc">Json Schema do Banco de Dados</a>
 
-Wireframes
+[Wireframes](https://github.com/douglasmachry/cantinhoverde/blob/master/artefatos/wireframes.md)
 
 
