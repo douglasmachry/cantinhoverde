@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Alert, Platform, YellowBox } from 'react-native';
-import { Container, Header, Left, Text, Body, Title, Button, Icon, View, Drawer, Right } from 'native-base';
+import { Container, Header, Left, Text, Body, Title, Button, Icon, View, Drawer, Right, TabHeading } from 'native-base';
 import SideBar from './sidebar';
 import Toast from 'react-native-toast-native';
 import firebase from 'firebase';
@@ -26,7 +26,7 @@ export default class VendasPendentes extends Component {
             recarregar: false,
             vendas: '',
             precos: '',
-
+            mensagem: 'Você não possui nenhum pagamento pendente!'
         };
         //this.buscarDados();
 
@@ -51,12 +51,14 @@ export default class VendasPendentes extends Component {
             if (valorAtual != null) {
                 valorAtual.totalEntrada += valorVendas;
                 valorAtual.totalReceber -= valorVendas;
+                if (valorAtual.totalReceber < 0)
+                    valorAtual.totalReceber = 0;
                 return valorAtual;
             } else {
                 return 0;
             }
         })
-
+        this.buscarDados();
         //this.props.navigation.goBack();
     }
 
@@ -87,6 +89,7 @@ export default class VendasPendentes extends Component {
                 itens.push(item);
                 //console.log(item);
             })
+
             this.setState({ vendas: itens });
         }, function (errorObject) {
             console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
@@ -106,10 +109,7 @@ export default class VendasPendentes extends Component {
         openDrawer = () => {
             this.drawer._root.open()
         };
-        //this.buscarDados;
-        this.database.on('child_changed', () => {
-            this.buscarDados();
-        });
+
         //this.setState({text: mes});
         return (
             <Drawer
@@ -133,6 +133,7 @@ export default class VendasPendentes extends Component {
                     </Header>
 
                     <View>
+                        
                         <FlatList
                             data={this.state.vendas}
                             renderItem={({ item }) => (this.renderRow(item))}
@@ -140,8 +141,11 @@ export default class VendasPendentes extends Component {
                         //extraData={this.state.recarregar}
 
                         />
+                        
                     </View>
-
+                    <View>
+                        <Text>{this.state.mensagem}</Text>
+                    </View>
 
 
 
@@ -157,8 +161,11 @@ export default class VendasPendentes extends Component {
         let linhaData = Text;
         if (Object.keys(venda.vendas).length == 0) {
             linhaData = null;
+
         } else {
             linhaData = <Text style={styles.data}>{venda.data.replace("-", "/").replace("-", "/")}</Text>;
+            //this.setState({ mensagem: '' });
+            this.state.mensagem = '';
         }
 
         return (

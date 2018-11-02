@@ -33,30 +33,41 @@ export default class EntradaCaixa extends React.Component {
     constructor(props) {
         super(props);
         this.database = firebase.database().ref('/fechamentoCaixa/');
+        //this.buscarDados = this.buscarDados();
         this.state = {
-            caixa:'',
+            caixa: '',
             umkg: 0,
             meiokg: 0,
             vendas: 0
         }
 
     }
-    componentWillMount() {
-       this.buscarDados();
-    }
+    
 
-    componentDidMount(){
-        
+    formatReal(int) {
+        var tmp = int + '';
+        tmp = tmp.replace(/([0-9]{2})$/g, ",$1");
+        if (tmp.length > 6)
+            tmp = tmp.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+
+        return tmp;
     }
 
     buscarDados() {
         this.database.on('value', snapshot => {
-            
-            this.setState({caixa:snapshot.val()})
-            
+
+            this.setState({ caixa: snapshot.val() })
+
         }, function (errorObject) {
             console.log("Erro na leitura do Banco de Dados: " + errorObject.code);
         });
+    }
+    componentWillMount() {
+        this.buscarDados();
+    }
+
+    componentDidMount() {
+        
     }
 
     closeDrawer = () => {
@@ -90,15 +101,15 @@ export default class EntradaCaixa extends React.Component {
                         <Body>
                             <Title>Administrar Vendas</Title>
                         </Body>
-                        
+
                     </Header>
                     <Content padder>
                         <View >
                             <Text>
-                                Entrada em Caixa: R$ {this.state.caixa.totalEntrada} {"\n"}
-                                Saída de Caixa: R$ {this.state.caixa.totalSaida}{"\n"}
-                                Saldo em Caixa: R$ {this.state.caixa.totalEntrada - this.state.caixa.totalSaida}{"\n"}
-                                Saldo a receber: R$ {this.state.caixa.totalReceber}
+                                Entrada em Caixa: R$ {this.formatReal(this.state.caixa.totalEntrada)} {"\n"}
+                                Saída de Caixa: R$ {this.formatReal(this.state.caixa.totalSaida)}{"\n"}
+                                Saldo em Caixa: R$ {this.formatReal(this.state.caixa.totalEntrada - this.state.caixa.totalSaida)}{"\n"}
+                                Saldo a receber: R$ {this.formatReal(this.state.caixa.totalReceber)}
                             </Text>
                         </View>
                         <View>
@@ -123,8 +134,8 @@ export default class EntradaCaixa extends React.Component {
     }
 }
 const styles = StyleSheet.create({
-    lista:{
+    lista: {
         fontSize: 17,
         lineHeight: 17
     }
- });
+});

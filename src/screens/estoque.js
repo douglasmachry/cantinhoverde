@@ -58,14 +58,15 @@ export default class Estoque extends Component {
         this.buscarDados();
     }
 
+    closeDrawer = () => {
+        this.drawer._root.close()
+    };
+    openDrawer = () => {
+        this.drawer._root.open()
+    };
 
     render() {
-        closeDrawer = () => {
-            this.drawer._root.close()
-        };
-        openDrawer = () => {
-            this.drawer._root.open()
-        };
+        
         //this.setState({text: mes});
         return (
             <Drawer
@@ -77,7 +78,7 @@ export default class Estoque extends Component {
                         <Left>
                             <Button
                                 transparent
-                                onPress={() => openDrawer()}
+                                onPress={() => this.openDrawer()}
                             >
                                 <Icon name="menu" />
                             </Button>
