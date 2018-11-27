@@ -9,6 +9,6 @@ Segue abaixo os artefatos uilizados para o projeto:
 
 [Wireframes](https://github.com/douglasmachry/cantinhoverde/blob/master/artefatos/wireframes.md)
 
-[Telas do Sistema](https://github.com/douglasmachry/cantinhoverde/blob/master/artefatos/telas/telas.md)
+[Diagrama de Classes](https://github.com/douglasmachry/cantinhoverde/blob/master/artefatos/Diagrama%20de%20Classes%20(1).png)
 
 
