@@ -11,7 +11,7 @@ import { createStackNavigator } from "react-navigation";
 import firebase from 'firebase';
 
 var config = {
-    apiKey: "AIzaSyCAvSdtSwI5e6GvqxfsMISwuCxH0lIrx3w",
+    apiKey: "API_KEY",
     authDomain: "controlevendas-257fc.firebaseapp.com",
     databaseURL: "https://controlevendas-257fc.firebaseio.com",
     projectId: "controlevendas-257fc",
